@@ -2,7 +2,7 @@
 // 新着情報データ
 const whatsNewData = [
   {
-    date: "2025年1月10日",
+    date: "2026年1月12日",
     badge: "v1.1",
     badgeClass: "",
     title: "バージョン1.1の改善",
@@ -16,7 +16,7 @@ const whatsNewData = [
     ]
   },
   {
-    date: "2024年12月1日",
+    date: "2025年10月1日",
     badge: "v1.0",
     badgeClass: "",
     title: "初版リリース",
