@@ -33,6 +33,8 @@
 - 各childリポジトリへ最新版をコピー
 - 各環境を最新状態に同期
 
+**注**: childという名前は、HubSpotのコードが格納されているフォルダ名が「child」だったことに由来します。
+
 ## テスト環境URL
 
 https://melbridge-dev.github.io/manual_swipeTalk_test/
