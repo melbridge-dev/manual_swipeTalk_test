@@ -2745,14 +2745,113 @@
         </div>
     </div>
 
-    <!-- Standard footer includes removed for HTML version -->
+    <!-- 更新履歴データとスクリプト（インライン） -->
+    <script>
+    // バージョン表示範囲
+    const VERSION_RANGE = { min: "1.0", max: "1.1" };
 
-    <!-- ★JSの読み込みは必ずこの形： -->
-    <script defer src="js/manual-ui.js?v=2025010520"></script>
+    // 全バージョンの新着情報データ
+    const _allWhatsNewData = [
+      {
+        date: "2026-01-12",
+        version: "1.1",
+        title: "バージョン1.1の改善",
+        modalTitle: "",
+        manualTitle: "バージョン1.1",
+        contents: [{ heading: "安定性の向上", text: "アプリケーションの安定性を向上させました。" }]
+      },
+      {
+        date: "2025-10-01",
+        version: "1.0",
+        title: "初版リリース",
+        modalTitle: "",
+        manualTitle: "バージョン1.0",
+        contents: [{ heading: "初版リリース", text: "しゃべり描き翻訳をリリースしました。" }]
+      }
+    ];
 
-    <!-- 更新履歴データとスクリプトの読み込み -->
-    <script src="js/whats-new-data.js?v=1.1.7"></script>
-    <script src="js/whats-new.js?v=1.1.7"></script>
+    // VERSION_RANGEでフィルタリング
+    const whatsNewData = _allWhatsNewData.filter(item => {
+      const v = parseFloat(item.version);
+      return v >= parseFloat(VERSION_RANGE.min) && v <= parseFloat(VERSION_RANGE.max);
+    });
+    const ITEMS_PER_PAGE = 5;
+
+    // TOCの更新履歴リストを動的生成
+    function generateWhatsNewTocList() {
+      const tocList = document.getElementById('whats-new-toc-list');
+      if (!tocList || typeof whatsNewData === 'undefined') return;
+      tocList.innerHTML = whatsNewData.map(item => {
+        const versionId = `whats-new-v${item.version.replace('.', '-')}`;
+        return `<li><a class="toc-sublink" href="#${versionId}" data-group-id="whats-new-items">v${item.version}</a></li>`;
+      }).join('');
+
+      // クリックハンドラを追加
+      tocList.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute('href');
+          if (!targetId) return;
+
+          // whats-newセクションを表示
+          const activateFn = window.activateSection;
+          if (activateFn) {
+            activateFn('#whats-new', { scrollToTop: false, closeMobile: true });
+          }
+
+          // 少し待ってからターゲット要素にスクロール
+          setTimeout(() => {
+            const targetEl = document.querySelector(targetId);
+            if (targetEl) {
+              const container = document.querySelector('.manual-content');
+              if (container) {
+                const offset = 80;
+                const cRect = container.getBoundingClientRect();
+                const eRect = targetEl.getBoundingClientRect();
+                const scrollTarget = container.scrollTop + (eRect.top - cRect.top) - offset;
+                container.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+              }
+            }
+          }, 150);
+        });
+      });
+    }
+
+    // WhatsNewManager クラス
+    class WhatsNewManager {
+      constructor() { this.currentPage = 1; this.init(); }
+      init() { this.renderMainPage(); }
+      renderMainPage() {
+        const container = document.getElementById('whatsNewContainer');
+        if (!container) return;
+        const start = (this.currentPage - 1) * ITEMS_PER_PAGE;
+        const pageData = whatsNewData.slice(start, start + ITEMS_PER_PAGE);
+        let html = '';
+        pageData.forEach((item, index) => {
+          const versionId = `whats-new-v${item.version.replace('.', '-')}`;
+          html += `<div class="news-item-wrapper" id="${versionId}"><h2 class="news-item-title">${item.manualTitle || item.title}</h2><article class="news-item"><div class="news-item-content">`;
+          if (item.contents && item.contents.length > 0) {
+            item.contents.forEach(content => {
+              html += `<div class="news-content-section"><h3 class="news-content-heading">${content.heading}</h3><p class="news-content-text">${content.text}</p>`;
+              if (content.image) html += `<div class="news-content-image"><img src="${content.image}" alt="${content.heading}" class="news-item-image" loading="lazy" style="max-width: 60%; height: auto;"></div>`;
+              if (content.link) html += `<p class="news-content-link"><a href="${content.link}" target="_blank" rel="noopener noreferrer">マニュアルを確認する <i class="material-icons">open_in_new</i></a></p>`;
+              html += `</div>`;
+            });
+          }
+          html += `</div></article></div>`;
+        });
+        container.innerHTML = html;
+      }
+    }
+
+    // 初期化
+    document.addEventListener('DOMContentLoaded', () => {
+      generateWhatsNewTocList();
+      if (typeof whatsNewData !== 'undefined' && whatsNewData.length > 0) {
+        window.whatsNewManager = new WhatsNewManager();
+      }
+    });
+    </script>
 
     <!-- TOCトグル機能 -->
     <script>
