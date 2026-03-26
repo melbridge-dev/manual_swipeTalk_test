@@ -1,5 +1,5 @@
 /**
- * Custom Material Design JavaScript for しゃべり描き翻訳™
+ * Custom Material Design JavaScript for しゃべり描き翻訳®
  * Handles interactive components and Material Design behaviors
  */
 
