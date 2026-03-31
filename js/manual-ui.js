@@ -48,8 +48,11 @@
   }
 
   /* ===== 02) URL & path helpers (updated for path-based routing) ===== */
-  // file:// プロトコルの場合はハッシュベースルーティングを使用
-  const USE_HASH_ROUTING = window.location.protocol === 'file:';
+  // file:// プロトコルまたはHubSpot環境の場合はハッシュベースルーティングを使用
+  const USE_HASH_ROUTING = window.location.protocol === 'file:'
+    || window.location.hostname.endsWith('.mitsubishielectric.co.jp')
+    || window.location.hostname.endsWith('.hubspot.com')
+    || window.location.hostname.endsWith('.hubspotpreview-na2.com');
 
   // GitHub Pagesのベースパス（リポジトリ名）
   // ローカル開発時は空文字、GitHub Pages時は '/リポジトリ名'
