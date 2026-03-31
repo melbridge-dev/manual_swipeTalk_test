@@ -66,9 +66,7 @@
   <!-- ========================
        HubSpot管理JS
   ========================= -->
-  {% require_js %}
-  <script src="{{ get_asset_url('child/js/manual-ui.js') }}"></script>
-  {% end_require_js %}
+  <!-- JSはbody末尾で読み込み（順序保証のためrequire_jsは使用しない） -->
   
   
 </head>
@@ -2755,6 +2753,7 @@
 
     <script src="{{ get_asset_url('child/js/whats-new-data.js') }}"></script>
     <script src="{{ get_asset_url('child/js/whats-new.js') }}"></script>
+    <script src="{{ get_asset_url('child/js/manual-ui.js') }}"></script>
 
 </body>
 
