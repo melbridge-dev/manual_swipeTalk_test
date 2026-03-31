@@ -106,14 +106,16 @@
   function updateUrlPath(path, { replace = false } = {}) {
     if (!path) return;
 
-    // file:// プロトコルの場合はハッシュベースルーティング
+    // ハッシュベースルーティング（file:// / HubSpot環境）
     if (USE_HASH_ROUTING) {
       const hashValue = path.startsWith('#') ? path : `#${path.replace(/^\//, '')}`;
+      const newUrl = window.location.pathname + window.location.search + hashValue;
       try {
         if (replace) {
-          window.location.replace(hashValue);
+          history.replaceState({ hash: hashValue }, '', newUrl);
         } else {
-          window.location.hash = hashValue;
+          if (window.location.hash === hashValue) return;
+          history.pushState({ hash: hashValue }, '', newUrl);
         }
         sendPageView(hashValue);
       } catch (_) {
@@ -152,6 +154,17 @@
   }
 
   function replaceUrlWithoutQuery(path) {
+    if (USE_HASH_ROUTING) {
+      const hashValue = path && path.startsWith('#') ? path : `#${(path || '').replace(/^\//, '')}`;
+      const newUrl = window.location.pathname + hashValue;
+      try {
+        history.replaceState({ hash: hashValue }, '', newUrl);
+        sendPageView(hashValue);
+      } catch (_) {
+        window.location.hash = hashValue;
+      }
+      return;
+    }
     const value = path && path.startsWith('/') ? path : `/${path || ''}`;
     try {
       const base = window.location.origin;
@@ -814,8 +827,10 @@
 
     // ブラウザの戻る/進むボタン対応（popstateイベント）
     window.addEventListener('popstate', function(e) {
-      const path = window.location.pathname;
-      const targetId = extractIdFromPath(path);
+      // ハッシュルーティング時はハッシュからIDを取得
+      const targetId = USE_HASH_ROUTING
+        ? (window.location.hash || '').replace(/^#/, '')
+        : extractIdFromPath(window.location.pathname);
 
       if (!targetId) {
         // ルート（BASE_PATH以下にIDがない場合）→ TOPへ
@@ -845,7 +860,7 @@
         }
       }
       // popstateの場合もページビューを送信
-      sendPageView(path);
+      sendPageView(USE_HASH_ROUTING ? (window.location.hash || '/') : window.location.pathname);
     });
 
     // スクロール連動機能
